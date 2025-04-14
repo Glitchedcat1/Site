@@ -1,9 +1,9 @@
 // Constants
+const TIMER_DURATION = 3 * 60 * 60 * 1000; // 3 hours in milliseconds
+const CODE = "1234"; // Code to disable the timer
 const TIMER_KEY = "timerEndTime";
 const DISABLED_KEY = "timerDisabled";
 const RESET_DATE_KEY = "resetDate";
-const TIMER_DURATION = 3 * 60 * 60 * 1000; // 3 hours in milliseconds
-const CODE = "1234"; // Code to disable the timer
 
 // DOM Elements
 const timerElement = document.getElementById("timer");
@@ -21,27 +21,40 @@ function closeTab() {
     window.close();
 }
 
+// Cookie Functions
+function setCookie(name, value, days) {
+    const expires = new Date(Date.now() + days * 864e5).toUTCString();
+    document.cookie = name + '=' + encodeURIComponent(value) + '; expires=' + expires + '; path=/';
+}
+
+function getCookie(name) {
+    return document.cookie.split('; ').reduce((r, v) => {
+        const parts = v.split('=');
+        return parts[0] === name ? decodeURIComponent(parts[1]) : r;
+    }, '');
+}
+
 // Timer Logic
 function startTimer() {
     const now = Date.now();
-    const resetDate = localStorage.getItem(RESET_DATE_KEY);
+    const resetDate = getCookie(RESET_DATE_KEY);
     const today = new Date().toISOString().split("T")[0];
 
     // Reset timer if it's a new day
     if (resetDate !== today) {
-        localStorage.setItem(RESET_DATE_KEY, today);
-        localStorage.removeItem(TIMER_KEY);
-        localStorage.removeItem(DISABLED_KEY);
+        setCookie(RESET_DATE_KEY, today, 1);
+        setCookie(TIMER_KEY, '', -1); // Clear the timer cookie
+        setCookie(DISABLED_KEY, '', -1); // Clear the disabled cookie
     }
 
     // Check if the timer is disabled
-    if (localStorage.getItem(DISABLED_KEY) === "true") {
+    if (getCookie(DISABLED_KEY) === "true") {
         timerElement.textContent = "Timer Disabled";
         return;
     }
 
     // Check if the timer has expired
-    const timerEndTime = localStorage.getItem(TIMER_KEY);
+    const timerEndTime = getCookie(TIMER_KEY);
     if (timerEndTime && now > parseInt(timerEndTime)) {
         closeTab();
         return;
@@ -49,7 +62,7 @@ function startTimer() {
 
     // Start or continue the timer
     const endTime = timerEndTime ? parseInt(timerEndTime) : now + TIMER_DURATION;
-    localStorage.setItem(TIMER_KEY, endTime);
+    setCookie(TIMER_KEY, endTime, 1); // Set the timer cookie for 1 day
 
     const interval = setInterval(() => {
         const remainingTime = endTime - Date.now();
@@ -70,9 +83,9 @@ function startTimer() {
 timerElement.addEventListener("click", () => {
     const userCode = prompt("Enter the code to disable the timer:");
     if (userCode === CODE) {
-        localStorage.setItem(DISABLED_KEY, "true");
+        setCookie(DISABLED_KEY, "true", 1); // Disable the timer for the rest of the day
         timerElement.textContent = "Timer Disabled";
-        alert("Timer has been disabled for the rest of the day. refresh the page for it to work.");
+        alert("Timer has been disabled for the rest of the day.");
     } else {
         alert("Incorrect code.");
     }
