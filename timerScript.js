@@ -61,6 +61,9 @@ function startTimer() {
             timerElement.textContent = formatTime(remainingTime);
         }
     }, 1000);
+
+    // Save the interval ID so it can be cleared when the user exits the page
+    window.timerInterval = interval;
 }
 
 // Disable Timer Logic
@@ -75,5 +78,14 @@ timerElement.addEventListener("click", () => {
     }
 });
 
-// Initialize Timer
-startTimer();
+// Pause Timer on Exit
+window.addEventListener("beforeunload", () => {
+    if (window.timerInterval) {
+        clearInterval(window.timerInterval);
+    }
+});
+
+// Resume Timer on Entry
+window.addEventListener("load", () => {
+    startTimer();
+});
