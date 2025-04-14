@@ -72,7 +72,7 @@ timerElement.addEventListener("click", () => {
     if (userCode === CODE) {
         localStorage.setItem(DISABLED_KEY, "true");
         timerElement.textContent = "Timer Disabled";
-        alert("Timer has been disabled for the rest of the day.");
+        alert("Timer has been disabled for the rest of the day. refresh the page for it to work.");
     } else {
         alert("Incorrect code.");
     }
