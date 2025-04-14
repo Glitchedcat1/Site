@@ -16,11 +16,6 @@ function formatTime(ms) {
     return `${hours}:${minutes}:${seconds}`;
 }
 
-function closeTab() {
-    alert("You need to exit the page.");
-    window.close();
-}
-
 // Cookie Functions
 function setCookie(name, value, days) {
     const expires = new Date(Date.now() + days * 864e5).toUTCString();
