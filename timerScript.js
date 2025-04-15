@@ -4,6 +4,8 @@ const CODE = "1234"; // Code to disable the timer
 const TIMER_KEY = "timerEndTime";
 const DISABLED_KEY = "timerDisabled";
 const RESET_DATE_KEY = "resetDate";
+const SYNC_URL_1 = "https://mathhelpog1.netlify.app/sync"; // URL to sync with the first website
+const SYNC_URL_2 = "https://mathhelpog2.netlify.app/sync"; // URL to sync with the second website
 
 // DOM Elements
 const timerElement = document.getElementById("timer");
@@ -29,8 +31,31 @@ function getCookie(name) {
     }, '');
 }
 
+// Sync Timer State
+async function syncTimerState(endTime, disabled) {
+    const syncData = { endTime, disabled };
+
+    // Sync with the first website
+    await fetch(SYNC_URL_1, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(syncData)
+    });
+
+    // Sync with the second website
+    await fetch(SYNC_URL_2, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(syncData)
+    });
+}
+
 // Timer Logic
-function startTimer() {
+async function startTimer() {
     const now = Date.now();
     const resetDate = getCookie(RESET_DATE_KEY);
     const today = new Date().toISOString().split("T")[0];
@@ -58,6 +83,9 @@ function startTimer() {
     // Start or continue the timer
     const endTime = timerEndTime ? parseInt(timerEndTime) : now + TIMER_DURATION;
     setCookie(TIMER_KEY, endTime, 1); // Set the timer cookie for 1 day
+
+    // Sync the timer state with both websites
+    await syncTimerState(endTime, getCookie(DISABLED_KEY) === "true");
 
     const interval = setInterval(() => {
         const remainingTime = endTime - Date.now();
