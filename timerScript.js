@@ -79,14 +79,14 @@ async function startTimer() {
 
     // Check if the timer has expired
     const timerEndTime = getCookie(TIMER_KEY);
+    let endTime;
     if (timerEndTime && now > parseInt(timerEndTime)) {
         closeTab();
         return;
+    } else {
+        endTime = timerEndTime ? parseInt(timerEndTime) : now + TIMER_DURATION;
+        setCookie(TIMER_KEY, endTime, 1); // Set the timer cookie for 1 day
     }
-
-    // Start or continue the timer
-    const endTime = timerEndTime ? parseInt(timerEndTime) : now + TIMER_DURATION;
-    setCookie(TIMER_KEY, endTime, 1); // Set the timer cookie for 1 day
 
     // Sync the timer state with both websites
     await syncTimerState(endTime, getCookie(DISABLED_KEY) === "true");
@@ -96,6 +96,7 @@ async function startTimer() {
 
         if (remainingTime <= 0) {
             clearInterval(interval);
+            timerElement.textContent = "00:00:00"; // Reset display when time is up
             closeTab();
         } else {
             timerElement.textContent = formatTime(remainingTime);
