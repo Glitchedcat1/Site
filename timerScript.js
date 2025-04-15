@@ -4,8 +4,6 @@ const CODE = "1234"; // Code to disable the timer
 const TIMER_KEY = "timerEndTime";
 const DISABLED_KEY = "timerDisabled";
 const RESET_DATE_KEY = "resetDate";
-const SYNC_URL_1 = "https://mathhelpog2.netlify.app/sync"; // Replace with your first Netlify site URL
-const SYNC_URL_2 = "https://mathhelpog1.netlify.app/sync"; // Replace with your second Netlify site URL
 
 // DOM Elements
 const timerElement = document.getElementById("timer");
@@ -31,33 +29,6 @@ function getCookie(name) {
     }, '');
 }
 
-// Sync Timer State
-async function syncTimerState(endTime, disabled) {
-    const syncData = { endTime, disabled };
-
-    try {
-        // Sync with the first website
-        await fetch(SYNC_URL_1, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(syncData)
-        });
-
-        // Sync with the second website
-        await fetch(SYNC_URL_2, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(syncData)
-        });
-    } catch (error) {
-        console.error("Error syncing timer state:", error);
-    }
-}
-
 // Timer Logic
 async function startTimer() {
     const now = Date.now();
@@ -79,16 +50,16 @@ async function startTimer() {
 
     // Check if the timer has expired
     const timerEndTime = getCookie(TIMER_KEY);
-    let endTime;
     if (timerEndTime && now > parseInt(timerEndTime)) {
         closeTab();
         return;
-    } else {
-        endTime = timerEndTime ? parseInt(timerEndTime) : now + TIMER_DURATION;
-        setCookie(TIMER_KEY, endTime, 1); // Set the timer cookie for 1 day
     }
 
-    // Sync the timer state with both websites
+    // Start or continue the timer
+    const endTime = timerEndTime ? parseInt(timerEndTime) : now + TIMER_DURATION;
+    setCookie(TIMER_KEY, endTime, 1); // Set the timer cookie for 1 day
+
+    // Sync the timer state with the server
     await syncTimerState(endTime, getCookie(DISABLED_KEY) === "true");
 
     const interval = setInterval(() => {
@@ -96,7 +67,7 @@ async function startTimer() {
 
         if (remainingTime <= 0) {
             clearInterval(interval);
-            timerElement.textContent = "00:00:00"; // Reset display when time is up
+            timerElement.textContent = "00:00:00"; // Display zero when time is up
             closeTab();
         } else {
             timerElement.textContent = formatTime(remainingTime);
@@ -108,15 +79,12 @@ async function startTimer() {
 }
 
 // Disable Timer Logic
-timerElement.addEventListener("click", async () => {
+timerElement.addEventListener("click", () => {
     const userCode = prompt("Enter the code to disable the timer:");
     if (userCode === CODE) {
         setCookie(DISABLED_KEY, "true", 1); // Disable the timer for the rest of the day
         timerElement.textContent = "Timer Disabled";
         alert("Timer has been disabled for the rest of the day.");
-
-        // Sync the disabled state
-        await syncTimerState(getCookie(TIMER_KEY), true);
     } else {
         alert("Incorrect code.");
     }
@@ -133,3 +101,4 @@ window.addEventListener("beforeunload", () => {
 window.addEventListener("load", () => {
     startTimer();
 });
+
