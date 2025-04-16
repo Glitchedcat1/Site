@@ -1,11 +1,13 @@
 // Constants
 const TIMER_KEY = "countdown_timer";
-const THIRTY_SECONDS = 30 * 1000; // 30 seconds in milliseconds
+const THREE_HOURS = 60 * 1000; // 3 hours in milliseconds
 
 // Helper Functions
 function formatTime(ms) {
-    const seconds = Math.floor(ms / 1000);
-    return `${seconds.toString().padStart(2, "0")}`;
+    const hours = Math.floor(ms / (1000 * 60 * 60));
+    const minutes = Math.floor((ms % (1000 * 60 * 60)) / (1000 * 60));
+    const seconds = Math.floor((ms % (1000 * 60)) / 1000);
+    return `${hours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
 }
 
 function setCookie(name, value, days) {
@@ -21,7 +23,7 @@ function getCookie(name) {
 }
 
 // Timer Logic
-let timerEndTime = parseInt(getCookie(TIMER_KEY)) || Date.now() + THIRTY_SECONDS;
+let timerEndTime = parseInt(getCookie(TIMER_KEY)) || Date.now() + THREE_HOURS;
 
 function updateTimer() {
     const now = Date.now();
