@@ -9,35 +9,36 @@
     <link rel="stylesheet" href="styles.css"> <!-- Link to the external CSS file -->
     <style>
         /* Additional styles for the countdown timer */
-        body {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100vh; /* Full height for centering */
-            margin: 0;
+        #timer-container {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            background-color: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-family: Arial, sans-serif;
+            z-index: 1000;
         }
         #timer {
-            font-size: 48px;
-            margin-bottom: 20px;
-            color: #333; /* Timer text color */
+            font-size: 24px;
         }
         button {
-            padding: 10px 20px;
-            font-size: 16px;
+            padding: 5px 10px;
+            font-size: 12px;
             cursor: pointer;
-            background-color: #007BFF; /* Button background color */
-            color: white; /* Button text color */
+            background-color: #007BFF;
+            color: white;
             border: none;
-            border-radius: 5px;
+            border-radius: 3px;
         }
         button:hover {
-            background-color: #0056b3; /* Button hover color */
+            background-color: #0056b3;
         }
         iframe {
-            width: 100%; /* Full width for the iframe */
-            height: 80%; /* Adjust height as needed */
-            border: none; /* Remove border */
+            width: 100%;
+            height: 80%;
+            border: none;
         }
     </style>
 </head>
@@ -45,8 +46,9 @@
     <iframe src="https://videogamenerds.wixstudio.com/math-help"></iframe>
 
     <!-- Countdown Timer Section -->
-    <div id="timer">Loading...</div>
-    <button id="disableTimer">Disable Timer</button>
+    <div id="timer-container">
+        <div id="timer">Loading...</div>
+    </div>
 
     <script src="countdownTimer.js"></script> <!-- Reference to the countdown timer script -->
 </body>
