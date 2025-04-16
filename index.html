@@ -9,14 +9,35 @@
     <link rel="stylesheet" href="styles.css"> <!-- Link to the external CSS file -->
     <style>
         /* Additional styles for the countdown timer */
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh; /* Full height for centering */
+            margin: 0;
+        }
         #timer {
             font-size: 48px;
             margin-bottom: 20px;
+            color: #333; /* Timer text color */
         }
         button {
             padding: 10px 20px;
             font-size: 16px;
             cursor: pointer;
+            background-color: #007BFF; /* Button background color */
+            color: white; /* Button text color */
+            border: none;
+            border-radius: 5px;
+        }
+        button:hover {
+            background-color: #0056b3; /* Button hover color */
+        }
+        iframe {
+            width: 100%; /* Full width for the iframe */
+            height: 80%; /* Adjust height as needed */
+            border: none; /* Remove border */
         }
     </style>
 </head>
