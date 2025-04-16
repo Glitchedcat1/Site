@@ -7,8 +7,26 @@
     <link rel="manifest" href="manifest.json">
     <link rel="icon" href="icon.png" type="image/png"> <!-- Favicon link -->
     <link rel="stylesheet" href="styles.css"> <!-- Link to the external CSS file -->
+    <style>
+        /* Additional styles for the countdown timer */
+        #timer {
+            font-size: 48px;
+            margin-bottom: 20px;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+    </style>
 </head>
 <body>
     <iframe src="https://videogamenerds.wixstudio.com/math-help"></iframe>
+
+    <!-- Countdown Timer Section -->
+    <div id="timer">Loading...</div>
+    <button id="disableTimer">Disable Timer</button>
+
+    <script src="countdownTimer.js"></script> <!-- Reference to the countdown timer script -->
 </body>
 </html>
