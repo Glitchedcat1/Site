@@ -75,4 +75,3 @@ window.addEventListener("load", () => {
     // Start the timer
     updateTimer();
 });
-
