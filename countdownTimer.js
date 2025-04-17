@@ -1,6 +1,5 @@
 // Constants
 const TIMER_KEY = "countdown_timer";
-const TIMER_PAUSED_KEY = "timer_paused";
 const THREE_HOURS = 3 * 60 * 60 * 1000; // 3 hours in milliseconds
 
 // Helper Functions
@@ -25,18 +24,9 @@ function getCookie(name) {
 
 // Timer Logic
 let timerEndTime = parseInt(getCookie(TIMER_KEY)) || Date.now() + THREE_HOURS;
-let timerPausedTime = parseInt(getCookie(TIMER_PAUSED_KEY)) || null;
 
 function updateTimer() {
     const now = Date.now();
-
-    // If the timer is paused, show the paused time
-    if (timerPausedTime) {
-        document.getElementById("timer").textContent = formatTime(timerPausedTime - now);
-        return;
-    }
-
-    // Calculate remaining time
     const remainingTime = timerEndTime - now;
 
     // If time is up, block access
@@ -52,26 +42,10 @@ function updateTimer() {
     requestAnimationFrame(updateTimer);
 }
 
-// Pause the timer when the user leaves the site
+// Save Timer State on Page Unload
 window.addEventListener("beforeunload", () => {
-    const now = Date.now();
-    const remainingTime = timerEndTime - now;
-
-    // Save the remaining time in a cookie
-    setCookie(TIMER_PAUSED_KEY, remainingTime, 1);
+    setCookie(TIMER_KEY, timerEndTime, 1); // Save timer end time in cookie for 1 day
 });
 
-// Resume the timer when the user returns to the site
-window.addEventListener("load", () => {
-    const now = Date.now();
-
-    // Check if the timer was paused
-    if (timerPausedTime) {
-        timerEndTime = now + timerPausedTime;
-        setCookie(TIMER_KEY, timerEndTime, 1);
-        setCookie(TIMER_PAUSED_KEY, "", -1); // Clear the paused time cookie
-    }
-
-    // Start the timer
-    updateTimer();
-});
+// Start the timer
+updateTimer();
