@@ -14,9 +14,26 @@
             height: 100vh; /* Full height of the viewport */
             border: none; /* Remove border */
         }
+        /* Timer styles */
+        #timer {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            background-color: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-family: Arial, sans-serif;
+            font-size: 24px;
+            cursor: pointer;
+            z-index: 1000;
+        }
     </style>
 </head>
 <body>
     <iframe src="https://videogamenerds.wixstudio.com/math-help"></iframe>
+    <div id="timer">Loading...</div>
+
+    <script src="timer.js"></script> <!-- Link to the timer script -->
 </body>
 </html>
