@@ -8,6 +8,12 @@
     <link rel="icon" href="icon.png" type="image/png"> <!-- Favicon link -->
     <link rel="stylesheet" href="styles.css"> <!-- Link to the external CSS file -->
     <style>
+        /* Make the iframe take up the whole screen */
+        iframe {
+            width: 100%;
+            height: 100vh; /* Full height of the viewport */
+            border: none; /* Remove border */
+        }
         /* Timer styles */
         #timer {
             position: fixed;
@@ -25,12 +31,10 @@
     </style>
 </head>
 <body>
-    <div id="embed-container">
-        <!-- Include the iframe from the separate file -->
-        <object type="text/html" data="embed.html" style="width: 100%; height: 100vh; border: none;"></object>
-    </div>
+    <iframe src="embed.html"></iframe> <!-- Path to the embed.html file -->
     <div id="timer">Loading...</div>
 
     <script src="timer.js"></script> <!-- Link to the timer script -->
 </body>
 </html>
+
