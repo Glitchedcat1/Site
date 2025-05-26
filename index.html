@@ -1,40 +1,80 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Math Help</title>
-    <link rel="manifest" href="manifest.json">
-    <link rel="icon" href="icon.png" type="image/png"> <!-- Favicon link -->
-    <link rel="stylesheet" href="styles.css"> <!-- Link to the external CSS file -->
-    <style>
-        /* Make the iframe take up the whole screen */
-        iframe {
-            width: 100%;
-            height: 100vh; /* Full height of the viewport */
-            border: none; /* Remove border */
-        }
-        /* Timer styles */
-        #timer {
-            position: fixed;
-            top: 10px;
-            right: 10px;
-            background-color: rgba(0, 0, 0, 0.8);
-            color: white;
-            padding: 10px 20px;
-            border-radius: 5px;
-            font-family: Arial, sans-serif;
-            font-size: 24px;
-            cursor: pointer;
-            z-index: 1000;
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Math Help</title>
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" href="icon.png" type="image/png" />
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    iframe {
+      width: 100%;
+      height: 100vh;
+      border: none;
+    }
+
+    #timer {
+      position: fixed;
+      top: 10px;
+      right: 10px;
+      background-color: rgba(0, 0, 0, 0.8);
+      color: white;
+      padding: 10px 20px;
+      border-radius: 5px;
+      font-family: Arial, sans-serif;
+      font-size: 24px;
+      cursor: pointer;
+      z-index: 1000;
+    }
+
+    #unlock-btn {
+      position: fixed;
+      top: 10px;
+      left: 10px;
+      background-color: #444;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 5px;
+      cursor: pointer;
+      z-index: 1000;
+    }
+
+    #cloak-controls {
+      display: none;
+      position: fixed;
+      top: 60px;
+      left: 10px;
+      background: white;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      z-index: 1000;
+    }
+
+    #cloak-controls button {
+      background-color: #0066cc;
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      cursor: pointer;
+      border-radius: 3px;
+    }
+  </style>
 </head>
 <body>
-    <iframe src="https://videogamenerds.wixstudio.com/math-help"></iframe>
-    <div id="timer">Loading...</div>
+  <iframe src="https://videogamenerds.wixstudio.com/math-help"></iframe>
+  <div id="timer">Loading...</div>
 
-    <script src="timer.js"></script> <!-- Link to the timer script -->
+  <button id="unlock-btn">🔓</button>
+
+  <div id="cloak-controls">
+    <p>Tab Cloak:</p>
+    <button id="tabcloak-btn">Activate Lexia Core5 Cloak</button>
+  </div>
+
+  <script src="timer.js"></script>
+  <script src="tabcloak.js"></script>
 </body>
 </html>
-
