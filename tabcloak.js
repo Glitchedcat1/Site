@@ -2,6 +2,8 @@ document.addEventListener("DOMContentLoaded", function () {
   const unlockBtn = document.getElementById("unlock-btn");
   const cloakPanel = document.getElementById("cloak-controls");
   const closePanelBtn = document.getElementById("close-cloak-panel");
+  const sneakyCheckbox = document.getElementById("openRealTab");
+
   const originalTitle = document.title;
   const originalFavicon = document.querySelector("link[rel~='icon']")?.href || "";
   const originalURL = window.location.href;
@@ -38,9 +40,14 @@ document.addEventListener("DOMContentLoaded", function () {
     }
     favicon.href = iconUrl;
 
-    // Push fake URL to history
+    // Update browser history (fake)
     if (fakeUrl) {
       window.history.pushState({}, "", fakeUrl);
+
+      // Actually visit the site in a new tab if sneaky checkbox is checked
+      if (sneakyCheckbox.checked) {
+        window.open(fakeUrl, "_blank", "noopener,noreferrer");
+      }
     }
   };
 
@@ -55,7 +62,6 @@ document.addEventListener("DOMContentLoaded", function () {
     }
     favicon.href = originalFavicon;
 
-    // Restore original URL
     window.history.pushState({}, "", originalURL);
   };
 });
