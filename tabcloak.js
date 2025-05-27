@@ -8,7 +8,7 @@ document.getElementById("unlock-btn").addEventListener("click", function () {
 });
 
 document.getElementById("tabcloak-btn").addEventListener("click", function () {
-  document.title = "Lexia Core5";
+  document.title = "Lexia Core 5";
 
   let favicon = document.querySelector("link[rel~='icon']");
   if (!favicon) {
