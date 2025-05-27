@@ -51,7 +51,7 @@
       border: 1px solid #ccc;
       border-radius: 5px;
       z-index: 1000;
-      min-width: 180px;
+      min-width: 200px;
     }
 
     #cloak-controls button {
@@ -63,6 +63,8 @@
       border-radius: 3px;
       display: block;
       margin-bottom: 5px;
+      width: 100%;
+      text-align: left;
     }
 
     #cloak-controls img {
@@ -98,13 +100,25 @@
       <p style="margin: 0;">Tab Cloak:</p>
       <button id="close-cloak-panel">✖</button>
     </div>
-    <button onclick="setCloak('Lexia Core5', 'images/lexia-favicon.png')">
+    <button onclick="setCloak('Lexia Core5', 'images/lexia-favicon.png', 'https://www.lexialearning.com/')">
       <img src="images/lexia-favicon.png" alt="Lexia Icon" width="16" height="16" /> Lexia Core5
     </button>
-    <button onclick="setCloak('Google Docs', 'images/google-docs-icon.png')">
+    <button onclick="setCloak('Google', 'images/google-favicon.png', 'https://www.google.com/')">
+      <img src="images/google-favicon.png" alt="Google Icon" width="16" height="16" /> Google
+    </button>
+    <button onclick="setCloak('Wikipedia', 'images/wikipedia-favicon.png', 'https://www.wikipedia.org/')">
+      <img src="images/wikipedia-favicon.png" alt="Wikipedia Icon" width="16" height="16" /> Wikipedia
+    </button>
+    <button onclick="setCloak('Khan Academy', 'images/khan-favicon.png', 'https://www.khanacademy.org/')">
+      <img src="images/khan-favicon.png" alt="Khan Academy Icon" width="16" height="16" /> Khan Academy
+    </button>
+    <button onclick="setCloak('Google Classroom', 'images/classroom-favicon.png', 'https://classroom.google.com/')">
+      <img src="images/classroom-favicon.png" alt="Google Classroom Icon" width="16" height="16" /> Google Classroom
+    </button>
+    <button onclick="setCloak('Google Docs', 'images/google-docs-icon.png', 'https://docs.google.com/')">
       <img src="images/google-docs-icon.png" alt="Google Docs Icon" width="16" height="16" /> Google Docs
     </button>
-    <button onclick="setCloak('Calculator', 'images/calculator-icon.png')">
+    <button onclick="setCloak('Calculator', 'images/calculator-icon.png', 'https://www.calculator.com/')">
       <img src="images/calculator-icon.png" alt="Calculator Icon" width="16" height="16" /> Calculator
     </button>
     <button onclick="resetCloak()">Reset Cloak</button>
