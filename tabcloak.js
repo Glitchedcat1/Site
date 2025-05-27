@@ -4,6 +4,7 @@ document.addEventListener("DOMContentLoaded", function () {
   const closePanelBtn = document.getElementById("close-cloak-panel");
   const originalTitle = document.title;
   const originalFavicon = document.querySelector("link[rel~='icon']")?.href || "";
+  const originalURL = window.location.href;
 
   unlockBtn.addEventListener("click", requestUnlock);
 
@@ -26,7 +27,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   }
 
-  window.setCloak = function (newTitle, iconUrl) {
+  window.setCloak = function (newTitle, iconUrl, fakeUrl) {
     document.title = newTitle;
 
     let favicon = document.querySelector("link[rel~='icon']");
@@ -36,6 +37,11 @@ document.addEventListener("DOMContentLoaded", function () {
       document.head.appendChild(favicon);
     }
     favicon.href = iconUrl;
+
+    // Push fake URL to history
+    if (fakeUrl) {
+      window.history.pushState({}, "", fakeUrl);
+    }
   };
 
   window.resetCloak = function () {
@@ -48,5 +54,8 @@ document.addEventListener("DOMContentLoaded", function () {
       document.head.appendChild(favicon);
     }
     favicon.href = originalFavicon;
+
+    // Restore original URL
+    window.history.pushState({}, "", originalURL);
   };
 });
