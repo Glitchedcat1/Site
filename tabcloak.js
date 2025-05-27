@@ -40,11 +40,9 @@ document.addEventListener("DOMContentLoaded", function () {
     }
     favicon.href = iconUrl;
 
-    // Update browser history (fake)
+    // Push new state with updated title
     if (fakeUrl) {
-      window.history.pushState({}, "", fakeUrl);
-
-      // Actually visit the site in a new tab if sneaky checkbox is checked
+      window.history.pushState({ cloak: newTitle }, newTitle, fakeUrl);
       if (sneakyCheckbox.checked) {
         window.open(fakeUrl, "_blank", "noopener,noreferrer");
       }
