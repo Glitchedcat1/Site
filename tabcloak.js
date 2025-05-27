@@ -1,6 +1,7 @@
 document.addEventListener("DOMContentLoaded", function () {
   const unlockBtn = document.getElementById("unlock-btn");
   const cloakPanel = document.getElementById("cloak-controls");
+  const closePanelBtn = document.getElementById("close-cloak-panel");
   const originalTitle = document.title;
   const originalFavicon = document.querySelector("link[rel~='icon']")?.href || "";
 
@@ -10,6 +11,10 @@ document.addEventListener("DOMContentLoaded", function () {
     if (e.ctrlKey && e.shiftKey && e.key === "D") {
       requestUnlock();
     }
+  });
+
+  closePanelBtn.addEventListener("click", function () {
+    cloakPanel.style.display = "none";
   });
 
   function requestUnlock() {
