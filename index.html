@@ -60,6 +60,13 @@
       padding: 10px 15px;
       cursor: pointer;
       border-radius: 3px;
+      display: block;
+      margin-bottom: 5px;
+    }
+
+    #cloak-controls img {
+      vertical-align: middle;
+      margin-right: 5px;
     }
   </style>
 </head>
@@ -71,7 +78,16 @@
 
   <div id="cloak-controls">
     <p>Tab Cloak:</p>
-    <button id="tabcloak-btn">Activate Lexia Core5 Cloak</button>
+    <button onclick="setCloak('Lexia Core5', 'images/lexia-favicon.png')">
+      <img src="images/lexia-favicon.png" alt="Lexia Icon" width="16" height="16" /> Lexia Core5
+    </button>
+    <button onclick="setCloak('Google Docs', 'images/google-docs-icon.png')">
+      <img src="images/google-docs-icon.png" alt="Google Docs Icon" width="16" height="16" /> Google Docs
+    </button>
+    <button onclick="setCloak('Calculator', 'images/calculator-icon.png')">
+      <img src="images/calculator-icon.png" alt="Calculator Icon" width="16" height="16" /> Calculator
+    </button>
+    <button onclick="resetCloak()">Reset Cloak</button>
   </div>
 
   <script src="timer.js"></script>
