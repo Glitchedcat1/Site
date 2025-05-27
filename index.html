@@ -51,7 +51,7 @@
       border: 1px solid #ccc;
       border-radius: 5px;
       z-index: 1000;
-      min-width: 200px;
+      min-width: 220px;
     }
 
     #cloak-controls button {
@@ -87,6 +87,10 @@
       align-items: center;
       margin-bottom: 10px;
     }
+
+    #sneaky-toggle {
+      margin-bottom: 10px;
+    }
   </style>
 </head>
 <body>
@@ -100,6 +104,10 @@
       <p style="margin: 0;">Tab Cloak:</p>
       <button id="close-cloak-panel">✖</button>
     </div>
+    <label id="sneaky-toggle">
+      <input type="checkbox" id="openRealTab" /> Sneaky history trick (open real site)
+    </label>
+
     <button onclick="setCloak('Lexia Core5', 'images/lexia-favicon.png', 'https://www.lexialearning.com/')">
       <img src="images/lexia-favicon.png" alt="Lexia Icon" width="16" height="16" /> Lexia Core5
     </button>
