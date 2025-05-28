@@ -81,4 +81,20 @@ document.addEventListener("DOMContentLoaded", function () {
     };
     reader.readAsDataURL(file);
   };
+
+  window.fakeAI = function () {
+    const input = document.getElementById("ai-input").value;
+    const chat = document.getElementById("chat-box");
+    const reply = document.createElement("div");
+    reply.innerHTML = `<strong>You:</strong> ${input}<br><strong>AI:</strong> ${getFakeReply(input)}`;
+    chat.appendChild(reply);
+    chat.scrollTop = chat.scrollHeight;
+    document.getElementById("ai-input").value = "";
+  };
+
+  function getFakeReply(q) {
+    if (q.toLowerCase().includes("math")) return "Try Khan Academy or WolframAlpha.";
+    if (q.toLowerCase().includes("game")) return "Games? Never heard of those 😇";
+    return "Interesting! Try Googling that.";
+  }
 });
