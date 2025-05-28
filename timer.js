@@ -3,6 +3,7 @@ const TIMER_KEY = "countdown_timer";
 const DISABLED_KEY = "timer_disabled";
 const RESET_DATE_KEY = "reset_date";
 const THREE_HOURS = 3 * 60 * 60 * 1000;
+const REQUIRE_UPLOAD_THRESHOLD = THREE_HOURS - (1 * 60 * 60 * 1000 + 59 * 60 * 1000);
 const DISABLE_CODE = "1234";
 
 // Helpers
@@ -24,11 +25,45 @@ function isNewDay(lastResetDate) {
 }
 
 // Globals
-let timerEndTime;
-let timerDisabled;
-let resetDate;
+let timerEndTime = getLocalStorage(TIMER_KEY);
+let timerDisabled = getLocalStorage(DISABLED_KEY);
+let resetDate = getLocalStorage(RESET_DATE_KEY);
 
-// Timer update loop
+// Reset logic
+if (!timerEndTime || isNewDay(resetDate)) {
+    timerEndTime = Date.now() + THREE_HOURS;
+    timerDisabled = false;
+    resetDate = new Date().toISOString().split("T")[0];
+    setLocalStorage(TIMER_KEY, timerEndTime);
+    setLocalStorage(DISABLED_KEY, timerDisabled);
+    setLocalStorage(RESET_DATE_KEY, resetDate);
+}
+
+const timeRemaining = timerEndTime - Date.now();
+
+// Handle file upload (if required)
+function uploadTimerState(file) {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+        try {
+            const state = JSON.parse(e.target.result);
+            timerEndTime = state.timerEndTime;
+            timerDisabled = state.timerDisabled;
+            resetDate = state.resetDate;
+
+            setLocalStorage(TIMER_KEY, timerEndTime);
+            setLocalStorage(DISABLED_KEY, timerDisabled);
+            setLocalStorage(RESET_DATE_KEY, resetDate);
+
+            startTimerUI();
+        } catch {
+            alert("Invalid timer file.");
+        }
+    };
+    reader.readAsText(file);
+}
+
+// Start UI loop
 function updateTimer() {
     const now = Date.now();
     const remainingTime = timerEndTime - now;
@@ -40,6 +75,8 @@ function updateTimer() {
 
     if (remainingTime <= 0) {
         document.body.innerHTML = "<h1 style='text-align:center; margin-top:20%;'>Access Denied. Please come back tomorrow.</h1>";
+        const iframe = document.getElementById("mathIframe");
+        if (iframe) iframe.style.display = "none";
         return;
     }
 
@@ -48,72 +85,8 @@ function updateTimer() {
     requestAnimationFrame(updateTimer);
 }
 
-// Export timer state
-function downloadTimerState() {
-    const timerState = {
-        timerEndTime,
-        timerDisabled,
-        resetDate
-    };
-    const blob = new Blob([JSON.stringify(timerState)], { type: "application/json" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "timer_state.json";
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-}
-
-// Load timer state
-function uploadTimerState(file) {
-    const reader = new FileReader();
-    reader.onload = (e) => {
-        try {
-            const state = JSON.parse(e.target.result);
-            timerEndTime = state.timerEndTime;
-            timerDisabled = state.timerDisabled;
-            resetDate = state.resetDate;
-
-            if (isNewDay(resetDate)) {
-                timerEndTime = Date.now() + THREE_HOURS;
-                timerDisabled = false;
-                resetDate = new Date().toISOString().split("T")[0];
-            }
-
-            setLocalStorage(TIMER_KEY, timerEndTime);
-            setLocalStorage(DISABLED_KEY, timerDisabled);
-            setLocalStorage(RESET_DATE_KEY, resetDate);
-
-            startTimerUI();
-        } catch {
-            alert("Invalid file.");
-        }
-    };
-    reader.readAsText(file);
-}
-
-// Show upload prompt
-window.addEventListener("load", () => {
-    const upload = document.createElement("input");
-    upload.type = "file";
-    upload.accept = ".json";
-    upload.style.display = "none";
-    upload.addEventListener("change", (e) => {
-        const file = e.target.files[0];
-        if (file) {
-            uploadTimerState(file);
-        } else {
-            alert("Timer file required to continue.");
-        }
-    });
-    document.body.appendChild(upload);
-    upload.click();
-});
-
-// Disable iframe on timeout
+// Timer interaction
 function startTimerUI() {
-    const iframe = document.querySelector("iframe");
     updateTimer();
 
     document.getElementById("timer").addEventListener("click", () => {
@@ -127,5 +100,41 @@ function startTimerUI() {
         }
     });
 
-    window.addEventListener("beforeunload", downloadTimerState);
+    window.addEventListener("beforeunload", () => {
+        const timerState = {
+            timerEndTime,
+            timerDisabled,
+            resetDate
+        };
+        const blob = new Blob([JSON.stringify(timerState)], { type: "application/json" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "timer_state.json";
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+    });
 }
+
+// Load conditionally based on remaining time
+window.addEventListener("load", () => {
+    if (timeRemaining > REQUIRE_UPLOAD_THRESHOLD) {
+        startTimerUI();
+    } else {
+        const upload = document.createElement("input");
+        upload.type = "file";
+        upload.accept = ".json";
+        upload.style.display = "none";
+        upload.addEventListener("change", (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                uploadTimerState(file);
+            } else {
+                alert("Timer file required to continue.");
+            }
+        });
+        document.body.appendChild(upload);
+        upload.click();
+    }
+});
