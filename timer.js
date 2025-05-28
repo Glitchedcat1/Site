@@ -28,17 +28,26 @@ function isNewDay() {
 }
 
 // Timer Logic
-let timerEndTime = getLocalStorage(TIMER_KEY) || Date.now() + THREE_HOURS;
-let timerDisabled = getLocalStorage(DISABLED_KEY) || false;
+let timerEndTime;
+let timerDisabled;
 
-// Reset timer if it's a new day
-if (isNewDay()) {
-    timerEndTime = Date.now() + THREE_HOURS;
-    timerDisabled = false;
-    setLocalStorage(RESET_DATE_KEY, new Date().toISOString().split("T")[0]); // Save today's date
-    setLocalStorage(DISABLED_KEY, false);
+// Function to initialize the timer
+function initializeTimer() {
+    // Check if it's a new day
+    if (isNewDay()) {
+        timerEndTime = Date.now() + THREE_HOURS;
+        timerDisabled = false;
+        setLocalStorage(RESET_DATE_KEY, new Date().toISOString().split("T")[0]); // Save today's date
+        setLocalStorage(DISABLED_KEY, false);
+    } else {
+        timerEndTime = getLocalStorage(TIMER_KEY) || Date.now() + THREE_HOURS;
+        timerDisabled = getLocalStorage(DISABLED_KEY) || false;
+    }
+
+    updateTimer();
 }
 
+// Function to update the timer display
 function updateTimer() {
     const now = Date.now();
     const remainingTime = timerEndTime - now;
@@ -58,14 +67,67 @@ function updateTimer() {
     // Update the timer display
     document.getElementById("timer").textContent = formatTime(remainingTime);
 
-    // Save the remaining time to localStorage
+    // Save the timer end time to localStorage
     setLocalStorage(TIMER_KEY, timerEndTime);
 
     // Continue updating
     requestAnimationFrame(updateTimer);
 }
 
-// Handle Timer Click
+// Function to handle file download
+function downloadTimerState() {
+    const timerState = {
+        timerEndTime,
+        timerDisabled,
+        resetDate: getLocalStorage(RESET_DATE_KEY)
+    };
+    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(timerState));
+    const downloadAnchorNode = document.createElement('a');
+    downloadAnchorNode.setAttribute("href", dataStr);
+    downloadAnchorNode.setAttribute("download", "timer_state.json");
+    document.body.appendChild(downloadAnchorNode);
+    downloadAnchorNode.click();
+    downloadAnchorNode.remove();
+}
+
+// Function to handle file upload
+function uploadTimerState(file) {
+    const reader = new FileReader();
+    reader.onload = function(event) {
+        try {
+            const timerState = JSON.parse(event.target.result);
+            timerEndTime = timerState.timerEndTime;
+            timerDisabled = timerState.timerDisabled;
+            setLocalStorage(TIMER_KEY, timerEndTime);
+            setLocalStorage(DISABLED_KEY, timerDisabled);
+            setLocalStorage(RESET_DATE_KEY, timerState.resetDate);
+            updateTimer();
+        } catch (e) {
+            alert("Invalid timer state file.");
+        }
+    };
+    reader.readAsText(file);
+}
+
+// Prompt user to upload timer state on page load
+window.addEventListener('load', () => {
+    const fileInput = document.createElement('input');
+    fileInput.type = 'file';
+    fileInput.accept = '.json';
+    fileInput.style.display = 'none';
+    fileInput.addEventListener('change', (event) => {
+        const file = event.target.files[0];
+        if (file) {
+            uploadTimerState(file);
+        } else {
+            alert("No file selected. Cannot proceed.");
+        }
+    });
+    document.body.appendChild(fileInput);
+    fileInput.click();
+});
+
+// Handle Timer Click to disable
 document.getElementById("timer").addEventListener("click", () => {
     const code = prompt("Enter the code to disable the timer:");
     if (code === DISABLE_CODE) {
@@ -77,5 +139,7 @@ document.getElementById("timer").addEventListener("click", () => {
     }
 });
 
-// Start the timer
-updateTimer();
+// Save timer state and download on page unload
+window.addEventListener('beforeunload', (event) => {
+    downloadTimerState();
+});
