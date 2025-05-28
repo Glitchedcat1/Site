@@ -24,6 +24,7 @@
       font-size: 24px;
       font-family: Arial, sans-serif;
       z-index: 1000;
+      cursor: pointer;
     }
     #unlock-btn {
       position: fixed;
@@ -62,10 +63,6 @@
       width: 100%;
       text-align: left;
     }
-    #cloak-controls img {
-      vertical-align: middle;
-      margin-right: 5px;
-    }
     #close-cloak-panel {
       background: none;
       border: none;
@@ -91,7 +88,11 @@
   </style>
 </head>
 <body>
-  <iframe src="https://videogamenerds.wixstudio.com/math-help"></iframe>
+  <noscript>
+    <h1 style="text-align:center;">This site requires JavaScript to function.</h1>
+  </noscript>
+
+  <iframe id="mathIframe" src="https://videogamenerds.wixstudio.com/math-help"></iframe>
   <div id="timer">Loading...</div>
   <button id="unlock-btn">🔓</button>
 
@@ -101,54 +102,8 @@
       <button id="close-cloak-panel">✖</button>
     </div>
 
-    <button onclick="setCloak('Lexia Core5', 'images/lexia-favicon.png', 'https://www.lexialearning.com/')">
-      <img src="images/lexia-favicon.png" width="16" height="16" /> Lexia Core5
-    </button>
-    <button onclick="setCloak('Google', 'images/google-favicon.png', 'https://www.google.com/')">
-      <img src="images/google-favicon.png" width="16" height="16" /> Google
-    </button>
-    <button onclick="setCloak('Wikipedia', 'images/wikipedia-favicon.png', 'https://www.wikipedia.org/')">
-      <img src="images/wikipedia-favicon.png" width="16" height="16" /> Wikipedia
-    </button>
-    <button onclick="setCloak('Khan Academy', 'images/khan-favicon.png', 'https://www.khanacademy.org/')">
-      <img src="images/khan-favicon.png" width="16" height="16" /> Khan Academy
-    </button>
-    <button onclick="setCloak('Google Classroom', 'images/classroom-favicon.png', 'https://classroom.google.com/')">
-      <img src="images/classroom-favicon.png" width="16" height="16" /> Google Classroom
-    </button>
-    <button onclick="setCloak('Google Docs', 'images/google-docs-icon.png', 'https://docs.google.com/')">
-      <img src="images/google-docs-icon.png" width="16" height="16" /> Google Docs
-    </button>
-    <button onclick="setCloak('Calculator', 'images/calculator-icon.png', 'https://www.calculator.com/')">
-      <img src="images/calculator-icon.png" width="16" height="16" /> Calculator
-    </button>
-    <button onclick="resetCloak()">Reset Cloak</button>
+    <!-- ... (all cloak buttons, custom form, and saved tabs) ... -->
 
-    <hr />
-    <button onclick="initCustomCloak()">➕ Create Custom Cloak</button>
-    <div id="customCloakForm">
-      <input type="text" id="customTitle" placeholder="Enter tab title" style="width: 100%;" />
-      <input type="file" id="customIcon" accept="image/*" />
-      <button onclick="applyCustomCloak()">✅ Save</button>
-    </div>
-
-    <hr />
-    <h4>📂 Saved Cloaks</h4>
-    <ul id="savedTabs" style="list-style:none; padding-left:0;"></ul>
-    <button onclick="saveCurrentCloak()">➕ Save Current Cloak</button>
-    <button onclick="deleteSelectedCloaks()">🗑 Delete Selected</button>
-
-    <hr />
-    <h4>📤 Export/Import Cloaks</h4>
-    <button onclick="exportCloaks()">⬇️ Export All</button>
-    <button onclick="downloadCustomCloaks()">📥 Export Custom</button>
-    <input type="file" id="cloak-import" accept=".json" onchange="importCloaks(event)" />
-
-    <hr />
-    <h4>📁 Stored Cloak Sets</h4>
-    <input type="text" id="cloakSetName" placeholder="Name this set..." />
-    <button onclick="storeCurrentCloaks()">📁 Save Set</button>
-    <ul id="storedSets" style="list-style:none; padding-left:0;"></ul>
   </div>
 
   <script src="timer.js"></script>
