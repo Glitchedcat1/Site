@@ -19,10 +19,9 @@ window.saveCurrentCloak = function () {
   all.push(entry);
   localStorage.setItem("tabFolder", JSON.stringify(all));
   renderTabFolder();
-  renderStoredSets(); // refresh list
+  renderStoredSets();
 };
 
-// Export
 window.exportCloaks = function () {
   const data = localStorage.getItem("tabFolder") || "[]";
   const blob = new Blob([data], { type: "application/json" });
@@ -33,7 +32,6 @@ window.exportCloaks = function () {
   link.click();
 };
 
-// Import
 window.importCloaks = function (event) {
   const file = event.target.files[0];
   if (!file) return;
@@ -53,7 +51,27 @@ window.importCloaks = function (event) {
   reader.readAsText(file);
 };
 
-// Storage category
+// 🆕 Download Custom Cloaks
+window.downloadCustomCloaks = function () {
+  const customOnly = (JSON.parse(localStorage.getItem("tabFolder") || "[]"))
+    .filter(c => !c.url.includes("google.com") && !c.url.includes("khanacademy.org") && !c.url.includes("wikipedia.org") && !c.url.includes("calculator.com") && !c.url.includes("classroom.google.com") && !c.url.includes("lexialearning.com"));
+
+  if (customOnly.length === 0) {
+    alert("No custom cloaks found.");
+    return;
+  }
+
+  const filename = prompt("Enter filename for your custom cloak export:", "my-custom-cloaks");
+  if (!filename) return;
+
+  const blob = new Blob([JSON.stringify(customOnly, null, 2)], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `${filename}.json`;
+  a.click();
+};
+
 window.storeCurrentCloaks = function () {
   const name = document.getElementById("cloakSetName").value.trim();
   if (!name) return alert("Name your set.");
