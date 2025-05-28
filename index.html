@@ -88,8 +88,14 @@
       margin-bottom: 10px;
     }
 
-    #sneaky-toggle {
-      margin-bottom: 10px;
+    #customCloakForm {
+      display: none;
+      margin-top: 10px;
+    }
+
+    #customCloakForm input,
+    #customCloakForm button {
+      margin-bottom: 5px;
     }
   </style>
 </head>
@@ -104,32 +110,38 @@
       <p style="margin: 0;">Tab Cloak:</p>
       <button id="close-cloak-panel">✖</button>
     </div>
-    <label id="sneaky-toggle">
-      <input type="checkbox" id="openRealTab" /> Sneaky history trick (open real site)
-    </label>
 
     <button onclick="setCloak('Lexia Core5', 'images/lexia-favicon.png', 'https://www.lexialearning.com/')">
-      <img src="images/lexia-favicon.png" alt="Lexia Icon" width="16" height="16" /> Lexia Core5
+      <img src="images/lexia-favicon.png" width="16" height="16" /> Lexia Core5
     </button>
     <button onclick="setCloak('Google', 'images/google-favicon.png', 'https://www.google.com/')">
-      <img src="images/google-favicon.png" alt="Google Icon" width="16" height="16" /> Google
+      <img src="images/google-favicon.png" width="16" height="16" /> Google
     </button>
     <button onclick="setCloak('Wikipedia', 'images/wikipedia-favicon.png', 'https://www.wikipedia.org/')">
-      <img src="images/wikipedia-favicon.png" alt="Wikipedia Icon" width="16" height="16" /> Wikipedia
+      <img src="images/wikipedia-favicon.png" width="16" height="16" /> Wikipedia
     </button>
     <button onclick="setCloak('Khan Academy', 'images/khan-favicon.png', 'https://www.khanacademy.org/')">
-      <img src="images/khan-favicon.png" alt="Khan Academy Icon" width="16" height="16" /> Khan Academy
+      <img src="images/khan-favicon.png" width="16" height="16" /> Khan Academy
     </button>
     <button onclick="setCloak('Google Classroom', 'images/classroom-favicon.png', 'https://classroom.google.com/')">
-      <img src="images/classroom-favicon.png" alt="Google Classroom Icon" width="16" height="16" /> Google Classroom
+      <img src="images/classroom-favicon.png" width="16" height="16" /> Google Classroom
     </button>
     <button onclick="setCloak('Google Docs', 'images/google-docs-icon.png', 'https://docs.google.com/')">
-      <img src="images/google-docs-icon.png" alt="Google Docs Icon" width="16" height="16" /> Google Docs
+      <img src="images/google-docs-icon.png" width="16" height="16" /> Google Docs
     </button>
     <button onclick="setCloak('Calculator', 'images/calculator-icon.png', 'https://www.calculator.com/')">
-      <img src="images/calculator-icon.png" alt="Calculator Icon" width="16" height="16" /> Calculator
+      <img src="images/calculator-icon.png" width="16" height="16" /> Calculator
     </button>
     <button onclick="resetCloak()">Reset Cloak</button>
+
+    <hr />
+    <button onclick="initCustomCloak()">➕ Create Custom Cloak</button>
+
+    <div id="customCloakForm">
+      <input type="text" id="customTitle" placeholder="Enter tab title" style="width: 100%;" />
+      <input type="file" id="customIcon" accept="image/*" />
+      <button onclick="applyCustomCloak()">✅ Save</button>
+    </div>
   </div>
 
   <script src="timer.js"></script>
