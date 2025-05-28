@@ -25,6 +25,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
   window.setCloak = function (newTitle, iconUrl, fakeUrl) {
     document.title = newTitle;
+
     let favicon = document.querySelector("link[rel~='icon']");
     if (!favicon) {
       favicon = document.createElement("link");
@@ -32,6 +33,7 @@ document.addEventListener("DOMContentLoaded", function () {
       document.head.appendChild(favicon);
     }
     favicon.href = iconUrl;
+
     if (fakeUrl) {
       window.history.pushState({ cloak: newTitle }, newTitle, fakeUrl);
     }
@@ -39,6 +41,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
   window.resetCloak = function () {
     document.title = originalTitle;
+
     let favicon = document.querySelector("link[rel~='icon']");
     if (!favicon) {
       favicon = document.createElement("link");
@@ -46,6 +49,7 @@ document.addEventListener("DOMContentLoaded", function () {
       document.head.appendChild(favicon);
     }
     favicon.href = originalFavicon;
+
     window.history.pushState({}, "", originalURL);
   };
 
@@ -66,6 +70,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const reader = new FileReader();
     reader.onload = function (e) {
       document.title = title;
+
       let favicon = document.querySelector("link[rel~='icon']");
       if (!favicon) {
         favicon = document.createElement("link");
