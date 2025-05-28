@@ -2,10 +2,16 @@ function renderTabFolder() {
   const container = document.getElementById("savedTabs");
   container.innerHTML = "";
   const list = JSON.parse(localStorage.getItem("tabFolder") || "[]");
-  list.forEach((item) => {
+
+  list.forEach((item, index) => {
     const li = document.createElement("li");
-    li.innerHTML = `<button onclick="setCloak('${item.title}', '${item.icon}', '${item.url}')">
-      <img src="${item.icon}" width="16" height="16" /> ${item.title}</button>`;
+    li.innerHTML = `
+      <label style="display:flex;align-items:center;gap:5px;">
+        <input type="checkbox" class="cloakCheckbox" data-index="${index}">
+        <img src="${item.icon}" width="16" height="16" />
+        <button onclick="setCloak('${item.title}', '${item.icon}', '${item.url}')">${item.title}</button>
+      </label>
+    `;
     container.appendChild(li);
   });
 }
@@ -32,26 +38,6 @@ window.exportCloaks = function () {
   link.click();
 };
 
-window.importCloaks = function (event) {
-  const file = event.target.files[0];
-  if (!file) return;
-  const reader = new FileReader();
-  reader.onload = function (e) {
-    try {
-      const imported = JSON.parse(e.target.result);
-      const existing = JSON.parse(localStorage.getItem("tabFolder") || "[]");
-      localStorage.setItem("tabFolder", JSON.stringify([...existing, ...imported]));
-      renderTabFolder();
-      renderStoredSets();
-      alert("Cloaks imported successfully!");
-    } catch (err) {
-      alert("Failed to import file.");
-    }
-  };
-  reader.readAsText(file);
-};
-
-// 🆕 Download Custom Cloaks
 window.downloadCustomCloaks = function () {
   const customOnly = (JSON.parse(localStorage.getItem("tabFolder") || "[]"))
     .filter(c => !c.url.includes("google.com") && !c.url.includes("khanacademy.org") && !c.url.includes("wikipedia.org") && !c.url.includes("calculator.com") && !c.url.includes("classroom.google.com") && !c.url.includes("lexialearning.com"));
@@ -70,6 +56,36 @@ window.downloadCustomCloaks = function () {
   a.href = url;
   a.download = `${filename}.json`;
   a.click();
+};
+
+window.importCloaks = function (event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function (e) {
+    try {
+      const imported = JSON.parse(e.target.result);
+      const existing = JSON.parse(localStorage.getItem("tabFolder") || "[]");
+      const combined = [...existing, ...imported];
+      localStorage.setItem("tabFolder", JSON.stringify(combined));
+      renderTabFolder();
+      renderStoredSets();
+      alert("Cloaks imported successfully!");
+    } catch (err) {
+      alert("Failed to import file.");
+    }
+  };
+  reader.readAsText(file);
+};
+
+window.deleteSelectedCloaks = function () {
+  const all = JSON.parse(localStorage.getItem("tabFolder") || "[]");
+  const checkboxes = document.querySelectorAll(".cloakCheckbox:checked");
+  const indexesToDelete = Array.from(checkboxes).map(cb => parseInt(cb.dataset.index));
+  const filtered = all.filter((_, index) => !indexesToDelete.includes(index));
+  localStorage.setItem("tabFolder", JSON.stringify(filtered));
+  renderTabFolder();
+  renderStoredSets();
 };
 
 window.storeCurrentCloaks = function () {
