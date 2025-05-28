@@ -1,140 +1,127 @@
-// Constants
-const TIMER_KEY = "countdown_timer";
-const DISABLED_KEY = "timer_disabled";
-const RESET_DATE_KEY = "reset_date";
-const THREE_HOURS = 3 * 60 * 60 * 1000;
-const REQUIRE_UPLOAD_THRESHOLD = THREE_HOURS - (1 * 60 * 60 * 1000 + 59 * 60 * 1000);
+// --- Constants ---
+const MAX_TIME = 3 * 60 * 60 * 1000; // 3 hours
+const LIMIT_REQUIRE_UPLOAD = MAX_TIME - (1 * 60 * 60 * 1000 + 59 * 60 * 1000); // 1h 59m
 const DISABLE_CODE = "1234";
 
-// Helpers
-function formatTime(ms) {
-    const hours = Math.floor(ms / (1000 * 60 * 60));
-    const minutes = Math.floor((ms % (1000 * 60 * 60)) / (1000 * 60));
-    const seconds = Math.floor((ms % (1000 * 60)) / 1000);
-    return `${hours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
-}
-function setLocalStorage(key, value) {
-    localStorage.setItem(key, JSON.stringify(value));
-}
-function getLocalStorage(key) {
-    return JSON.parse(localStorage.getItem(key));
-}
-function isNewDay(lastResetDate) {
-    const today = new Date().toISOString().split("T")[0];
-    return today !== lastResetDate;
+// --- State Variables ---
+let timerEnd = null;
+let disabled = false;
+let resetDate = null;
+
+// --- Time Formatter ---
+function format(ms) {
+  const h = String(Math.floor(ms / 3600000)).padStart(2, '0');
+  const m = String(Math.floor((ms % 3600000) / 60000)).padStart(2, '0');
+  const s = String(Math.floor((ms % 60000) / 1000)).padStart(2, '0');
+  return `${h}:${m}:${s}`;
 }
 
-// Globals
-let timerEndTime = getLocalStorage(TIMER_KEY);
-let timerDisabled = getLocalStorage(DISABLED_KEY);
-let resetDate = getLocalStorage(RESET_DATE_KEY);
-
-// Reset logic
-if (!timerEndTime || isNewDay(resetDate)) {
-    timerEndTime = Date.now() + THREE_HOURS;
-    timerDisabled = false;
-    resetDate = new Date().toISOString().split("T")[0];
-    setLocalStorage(TIMER_KEY, timerEndTime);
-    setLocalStorage(DISABLED_KEY, timerDisabled);
-    setLocalStorage(RESET_DATE_KEY, resetDate);
+// --- File I/O ---
+function saveToFile() {
+  const blob = new Blob([JSON.stringify({ timerEnd, disabled, resetDate })], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = "timer_state.json";
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
 }
 
-const timeRemaining = timerEndTime - Date.now();
-
-// Handle file upload (if required)
-function uploadTimerState(file) {
-    const reader = new FileReader();
-    reader.onload = (e) => {
-        try {
-            const state = JSON.parse(e.target.result);
-            timerEndTime = state.timerEndTime;
-            timerDisabled = state.timerDisabled;
-            resetDate = state.resetDate;
-
-            setLocalStorage(TIMER_KEY, timerEndTime);
-            setLocalStorage(DISABLED_KEY, timerDisabled);
-            setLocalStorage(RESET_DATE_KEY, resetDate);
-
-            startTimerUI();
-        } catch {
-            alert("Invalid timer file.");
-        }
-    };
-    reader.readAsText(file);
+function loadFromFile(file) {
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const data = JSON.parse(e.target.result);
+      timerEnd = data.timerEnd;
+      disabled = data.disabled;
+      resetDate = data.resetDate;
+      startTimer();
+    } catch {
+      alert("Invalid file.");
+    }
+  };
+  reader.readAsText(file);
 }
 
-// Start UI loop
+// --- Reset Logic ---
+function isNewDay() {
+  const today = new Date().toISOString().split("T")[0];
+  return today !== resetDate;
+}
+
+// --- Timer Loop ---
 function updateTimer() {
-    const now = Date.now();
-    const remainingTime = timerEndTime - now;
+  const now = Date.now();
+  const remain = timerEnd - now;
 
-    if (timerDisabled) {
-        document.getElementById("timer").textContent = "Timer Disabled for Today";
-        return;
-    }
+  if (disabled) {
+    document.getElementById("timer").textContent = "Timer Disabled";
+    return;
+  }
 
-    if (remainingTime <= 0) {
-        document.body.innerHTML = "<h1 style='text-align:center; margin-top:20%;'>Access Denied. Please come back tomorrow.</h1>";
-        const iframe = document.getElementById("mathIframe");
-        if (iframe) iframe.style.display = "none";
-        return;
-    }
+  if (remain <= 0) {
+    document.body.innerHTML = "<h1 style='text-align:center;margin-top:20%;'>Access Denied. Please come back tomorrow.</h1>";
+    const iframe = document.getElementById("mathIframe");
+    if (iframe) iframe.style.display = "none";
+    return;
+  }
 
-    document.getElementById("timer").textContent = formatTime(remainingTime);
-    setLocalStorage(TIMER_KEY, timerEndTime);
-    requestAnimationFrame(updateTimer);
+  document.getElementById("timer").textContent = format(remain);
+  requestAnimationFrame(updateTimer);
 }
 
-// Timer interaction
-function startTimerUI() {
-    updateTimer();
-
-    document.getElementById("timer").addEventListener("click", () => {
-        const code = prompt("Enter code to disable timer:");
-        if (code === DISABLE_CODE) {
-            timerDisabled = true;
-            setLocalStorage(DISABLED_KEY, true);
-            document.getElementById("timer").textContent = "Timer Disabled for Today";
-        } else {
-            alert("Incorrect code.");
-        }
-    });
-
-    window.addEventListener("beforeunload", () => {
-        const timerState = {
-            timerEndTime,
-            timerDisabled,
-            resetDate
-        };
-        const blob = new Blob([JSON.stringify(timerState)], { type: "application/json" });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = "timer_state.json";
-        document.body.appendChild(a);
-        a.click();
-        a.remove();
-    });
+// --- Timer Setup ---
+function startTimer() {
+  localStorage.setItem("timerEnd", timerEnd);
+  localStorage.setItem("disabled", disabled);
+  localStorage.setItem("resetDate", resetDate);
+  updateTimer();
 }
 
-// Load conditionally based on remaining time
-window.addEventListener("load", () => {
-    if (timeRemaining > REQUIRE_UPLOAD_THRESHOLD) {
-        startTimerUI();
+// --- Timer Click to Disable ---
+document.addEventListener("DOMContentLoaded", () => {
+  const el = document.getElementById("timer");
+  el.addEventListener("click", () => {
+    const code = prompt("Enter code to disable:");
+    if (code === DISABLE_CODE) {
+      disabled = true;
+      localStorage.setItem("disabled", true);
+      el.textContent = "Timer Disabled";
     } else {
-        const upload = document.createElement("input");
-        upload.type = "file";
-        upload.accept = ".json";
-        upload.style.display = "none";
-        upload.addEventListener("change", (e) => {
-            const file = e.target.files[0];
-            if (file) {
-                uploadTimerState(file);
-            } else {
-                alert("Timer file required to continue.");
-            }
-        });
-        document.body.appendChild(upload);
-        upload.click();
+      alert("Wrong code.");
     }
+  });
+
+  window.addEventListener("beforeunload", saveToFile);
+
+  // Restore if possible
+  const savedEnd = localStorage.getItem("timerEnd");
+  const savedDisabled = localStorage.getItem("disabled");
+  const savedDate = localStorage.getItem("resetDate");
+  const now = Date.now();
+
+  if (savedEnd && savedDate && !isNewDay()) {
+    timerEnd = parseInt(savedEnd);
+    resetDate = savedDate;
+    disabled = savedDisabled === "true";
+
+    const timeLeft = timerEnd - now;
+    if (timeLeft < LIMIT_REQUIRE_UPLOAD) {
+      const fileInput = document.createElement("input");
+      fileInput.type = "file";
+      fileInput.accept = ".json";
+      fileInput.style.display = "none";
+      fileInput.addEventListener("change", e => loadFromFile(e.target.files[0]));
+      document.body.appendChild(fileInput);
+      fileInput.click();
+    } else {
+      startTimer();
+    }
+  } else {
+    // Fresh day or missing data
+    timerEnd = now + MAX_TIME;
+    disabled = false;
+    resetDate = new Date().toISOString().split("T")[0];
+    startTimer();
+  }
 });
