@@ -13,7 +13,6 @@
       height: 100vh;
       border: none;
     }
-
     #timer {
       position: fixed;
       top: 10px;
@@ -22,12 +21,10 @@
       color: white;
       padding: 10px 20px;
       border-radius: 5px;
-      font-family: Arial, sans-serif;
       font-size: 24px;
-      cursor: pointer;
+      font-family: Arial, sans-serif;
       z-index: 1000;
     }
-
     #unlock-btn {
       position: fixed;
       top: 10px;
@@ -40,7 +37,6 @@
       cursor: pointer;
       z-index: 1000;
     }
-
     #cloak-controls {
       display: none;
       position: fixed;
@@ -53,25 +49,21 @@
       z-index: 1000;
       min-width: 220px;
     }
-
     #cloak-controls button {
       background-color: #0066cc;
       color: white;
       border: none;
       padding: 10px 15px;
-      cursor: pointer;
       border-radius: 3px;
-      display: block;
+      cursor: pointer;
       margin-bottom: 5px;
       width: 100%;
       text-align: left;
     }
-
     #cloak-controls img {
       vertical-align: middle;
       margin-right: 5px;
     }
-
     #close-cloak-panel {
       background: none;
       border: none;
@@ -80,19 +72,16 @@
       font-size: 16px;
       cursor: pointer;
     }
-
     #cloak-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
       margin-bottom: 10px;
     }
-
     #customCloakForm {
       display: none;
       margin-top: 10px;
     }
-
     #customCloakForm input,
     #customCloakForm button {
       margin-bottom: 5px;
@@ -102,7 +91,6 @@
 <body>
   <iframe src="https://videogamenerds.wixstudio.com/math-help"></iframe>
   <div id="timer">Loading...</div>
-
   <button id="unlock-btn">🔓</button>
 
   <div id="cloak-controls">
@@ -136,7 +124,6 @@
 
     <hr />
     <button onclick="initCustomCloak()">➕ Create Custom Cloak</button>
-
     <div id="customCloakForm">
       <input type="text" id="customTitle" placeholder="Enter tab title" style="width: 100%;" />
       <input type="file" id="customIcon" accept="image/*" />
@@ -144,7 +131,27 @@
     </div>
   </div>
 
+  <!-- Tab Folder -->
+  <div id="tab-folder" style="display:none; position:fixed; bottom:10px; left:10px; background:white; border:1px solid #ccc; padding:10px; border-radius:5px; z-index:1000;">
+    <h4>📂 Saved Cloaks</h4>
+    <ul id="savedTabs" style="list-style:none; padding-left:0;"></ul>
+    <button onclick="saveCurrentCloak()">➕ Save Current Cloak</button>
+  </div>
+
+  <!-- AI Chat Helper -->
+  <div id="ai-helper" style="display:none; position:fixed; bottom:10px; right:10px; width:300px; background:white; border:1px solid #ccc; border-radius:5px; padding:10px; z-index:1000;">
+    <h4>🧠 AI Helper</h4>
+    <div id="chat-box" style="height:150px; overflow-y:auto; background:#f9f9f9; margin-bottom:5px; padding:5px;"></div>
+    <input type="text" id="ai-input" placeholder="Ask something..." style="width:100%;" />
+    <button onclick="fakeAI()">Send</button>
+  </div>
+
+  <!-- Show Buttons -->
+  <button onclick="document.getElementById('tab-folder').style.display='block'" style="position:fixed; bottom:70px; left:10px; z-index:999;">📁 Tab Folder</button>
+  <button onclick="document.getElementById('ai-helper').style.display='block'" style="position:fixed; bottom:70px; right:10px; z-index:999;">💬 AI</button>
+
   <script src="timer.js"></script>
   <script src="tabcloak.js"></script>
+  <script src="tabfolder.js"></script>
 </body>
 </html>
