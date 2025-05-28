@@ -81,7 +81,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
       const pathName = `/customcloak/${title.toLowerCase().replace(/\s+/g, "-")}`;
       window.history.pushState({ cloak: title }, title, pathName);
-
       document.getElementById("customCloakForm").style.display = "none";
     };
     reader.readAsDataURL(file);
