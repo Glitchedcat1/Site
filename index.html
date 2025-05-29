@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Secure Timer Site</title>
+  <title>Math Help</title>
   <link rel="manifest" href="manifest.json" />
   <link rel="icon" href="icon.png" type="image/png" />
   <link rel="stylesheet" href="styles.css" />
@@ -24,7 +24,6 @@
       font-size: 24px;
       font-family: Arial, sans-serif;
       z-index: 1000;
-      cursor: pointer;
     }
     #unlock-btn {
       position: fixed;
@@ -63,6 +62,10 @@
       width: 100%;
       text-align: left;
     }
+    #cloak-controls img {
+      vertical-align: middle;
+      margin-right: 5px;
+    }
     #close-cloak-panel {
       background: none;
       border: none;
@@ -88,33 +91,66 @@
   </style>
 </head>
 <body>
-  <noscript>
-    <h1 style="text-align:center;">This site requires JavaScript to function.</h1>
-  </noscript>
-
-  <!-- Iframe with ID for control -->
-  <iframe id="mathIframe" src="https://videogamenerds.wixstudio.com/math-help"></iframe>
-
-  <!-- Timer -->
+  <iframe src="https://videogamenerds.wixstudio.com/math-help"></iframe>
   <div id="timer">Loading...</div>
-
-  <!-- Tab Cloak Unlock Button -->
   <button id="unlock-btn">🔓</button>
 
-  <!-- Tab Cloak Controls -->
   <div id="cloak-controls">
     <div id="cloak-header">
       <p style="margin: 0;">Tab Cloak:</p>
       <button id="close-cloak-panel">✖</button>
     </div>
-    <!-- Dynamic cloak buttons will be inserted here -->
+
+    <button onclick="setCloak('Lexia Core5', 'images/lexia-favicon.png', 'https://www.lexialearning.com/')">
+      <img src="images/lexia-favicon.png" width="16" height="16" /> Lexia Core5
+    </button>
+    <button onclick="setCloak('Google', 'images/google-favicon.png', 'https://www.google.com/')">
+      <img src="images/google-favicon.png" width="16" height="16" /> Google
+    </button>
+    <button onclick="setCloak('Wikipedia', 'images/wikipedia-favicon.png', 'https://www.wikipedia.org/')">
+      <img src="images/wikipedia-favicon.png" width="16" height="16" /> Wikipedia
+    </button>
+    <button onclick="setCloak('Khan Academy', 'images/khan-favicon.png', 'https://www.khanacademy.org/')">
+      <img src="images/khan-favicon.png" width="16" height="16" /> Khan Academy
+    </button>
+    <button onclick="setCloak('Google Classroom', 'images/classroom-favicon.png', 'https://classroom.google.com/')">
+      <img src="images/classroom-favicon.png" width="16" height="16" /> Google Classroom
+    </button>
+    <button onclick="setCloak('Google Docs', 'images/google-docs-icon.png', 'https://docs.google.com/')">
+      <img src="images/google-docs-icon.png" width="16" height="16" /> Google Docs
+    </button>
+    <button onclick="setCloak('Calculator', 'images/calculator-icon.png', 'https://www.calculator.com/')">
+      <img src="images/calculator-icon.png" width="16" height="16" /> Calculator
+    </button>
+    <button onclick="resetCloak()">Reset Cloak</button>
+
+    <hr />
+    <button onclick="initCustomCloak()">➕ Create Custom Cloak</button>
+    <div id="customCloakForm">
+      <input type="text" id="customTitle" placeholder="Enter tab title" style="width: 100%;" />
+      <input type="file" id="customIcon" accept="image/*" />
+      <button onclick="applyCustomCloak()">✅ Save</button>
+    </div>
+
+    <hr />
+    <h4>📂 Saved Cloaks</h4>
+    <ul id="savedTabs" style="list-style:none; padding-left:0;"></ul>
+    <button onclick="saveCurrentCloak()">➕ Save Current Cloak</button>
+    <button onclick="deleteSelectedCloaks()">🗑 Delete Selected</button>
+
+    <hr />
+    <h4>📤 Export/Import Cloaks</h4>
+    <button onclick="exportCloaks()">⬇️ Export All</button>
+    <button onclick="downloadCustomCloaks()">📥 Export Custom</button>
+    <input type="file" id="cloak-import" accept=".json" onchange="importCloaks(event)" />
+
+    <hr />
+    <h4>📁 Stored Cloak Sets</h4>
+    <input type="text" id="cloakSetName" placeholder="Name this set..." />
+    <button onclick="storeCurrentCloaks()">📁 Save Set</button>
+    <ul id="storedSets" style="list-style:none; padding-left:0;"></ul>
   </div>
 
-  <!-- File Generator Button -->
-  <button id="generateFileBtn" style="position: fixed; bottom: 10px; left: 10px; z-index: 1000;">Generate Timer File</button>
-  <input type="file" id="fileInput" accept=".json" style="display:none;" />
-
-  <!-- Scripts -->
   <script src="timer.js"></script>
   <script src="tabcloak.js"></script>
   <script src="tabfolder.js"></script>
