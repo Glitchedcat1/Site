@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Math Help</title>
+  <title>Secure Timer Site</title>
   <link rel="manifest" href="manifest.json" />
   <link rel="icon" href="icon.png" type="image/png" />
   <link rel="stylesheet" href="styles.css" />
@@ -92,20 +92,29 @@
     <h1 style="text-align:center;">This site requires JavaScript to function.</h1>
   </noscript>
 
+  <!-- Iframe with ID for control -->
   <iframe id="mathIframe" src="https://videogamenerds.wixstudio.com/math-help"></iframe>
+
+  <!-- Timer -->
   <div id="timer">Loading...</div>
+
+  <!-- Tab Cloak Unlock Button -->
   <button id="unlock-btn">🔓</button>
 
+  <!-- Tab Cloak Controls -->
   <div id="cloak-controls">
     <div id="cloak-header">
       <p style="margin: 0;">Tab Cloak:</p>
       <button id="close-cloak-panel">✖</button>
     </div>
-
-    <!-- ... (all cloak buttons, custom form, and saved tabs) ... -->
-
+    <!-- Dynamic cloak buttons will be inserted here -->
   </div>
 
+  <!-- File Generator Button -->
+  <button id="generateFileBtn" style="position: fixed; bottom: 10px; left: 10px; z-index: 1000;">Generate Timer File</button>
+  <input type="file" id="fileInput" accept=".json" style="display:none;" />
+
+  <!-- Scripts -->
   <script src="timer.js"></script>
   <script src="tabcloak.js"></script>
   <script src="tabfolder.js"></script>
