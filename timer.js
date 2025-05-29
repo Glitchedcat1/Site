@@ -1,127 +1,157 @@
-// --- Constants ---
-const MAX_TIME = 3 * 60 * 60 * 1000; // 3 hours
-const LIMIT_REQUIRE_UPLOAD = MAX_TIME - (1 * 60 * 60 * 1000 + 59 * 60 * 1000); // 1h 59m
-const DISABLE_CODE = "1234";
+// Constants
+const TIMER_DURATION = 2 * 60 * 60 * 1000; // 2 hours in milliseconds
+const FILE_VALIDITY_DURATION = 15 * 60 * 1000; // 15 minutes in milliseconds
+const FILE_GENERATION_INTERVAL = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
+const STORAGE_KEYS = {
+  LAST_GENERATION: 'lastGenerationTime'
+};
 
-// --- State Variables ---
+// Elements
+const timerDisplay = document.getElementById('timer');
+const generateFileBtn = document.getElementById('generateFileBtn');
+const fileInput = document.getElementById('fileInput');
+
+// State
 let timerEnd = null;
-let disabled = false;
-let resetDate = null;
+let timerInterval = null;
 
-// --- Time Formatter ---
-function format(ms) {
-  const h = String(Math.floor(ms / 3600000)).padStart(2, '0');
-  const m = String(Math.floor((ms % 3600000) / 60000)).padStart(2, '0');
-  const s = String(Math.floor((ms % 60000) / 1000)).padStart(2, '0');
-  return `${h}:${m}:${s}`;
+// Functions
+
+// Format milliseconds into HH:MM:SS
+function formatTime(ms) {
+  const totalSeconds = Math.floor(ms / 1000);
+  const hours = String(Math.floor(totalSeconds / 3600)).padStart(2, '0');
+  const minutes = String(Math.floor((totalSeconds % 3600) / 60)).padStart(2, '0');
+  const seconds = String(totalSeconds % 60).padStart(2, '0');
+  return `${hours}:${minutes}:${seconds}`;
 }
 
-// --- File I/O ---
-function saveToFile() {
-  const blob = new Blob([JSON.stringify({ timerEnd, disabled, resetDate })], { type: 'application/json' });
+// Update the timer display
+function updateTimer() {
+  const remaining = timerEnd - Date.now();
+  if (remaining <= 0) {
+    clearInterval(timerInterval);
+    timerDisplay.textContent = 'Time is up!';
+    return;
+  }
+  timerDisplay.textContent = formatTime(remaining);
+}
+
+// Start the timer
+function startTimer(duration) {
+  timerEnd = Date.now() + duration;
+  updateTimer();
+  timerInterval = setInterval(updateTimer, 1000);
+}
+
+// Generate a new timer file
+function generateTimerFile() {
+  const lastGeneration = localStorage.getItem(STORAGE_KEYS.LAST_GENERATION);
+  const now = Date.now();
+
+  if (lastGeneration && now - parseInt(lastGeneration, 10) < FILE_GENERATION_INTERVAL) {
+    alert('You can only generate a new file once every 24 hours.');
+    return;
+  }
+
+  const timerData = {
+    timerEnd: now + TIMER_DURATION,
+    used: false,
+    date: now
+  };
+
+  const blob = new Blob([JSON.stringify(timerData)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = "timer_state.json";
+  a.href = url;
+  a.download = 'timer_state.json';
   document.body.appendChild(a);
   a.click();
-  a.remove();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+
+  localStorage.setItem(STORAGE_KEYS.LAST_GENERATION, now.toString());
 }
 
-function loadFromFile(file) {
+// Validate the uploaded timer file
+function validateAndStartTimer(file) {
   const reader = new FileReader();
-  reader.onload = e => {
+  reader.onload = function(event) {
     try {
-      const data = JSON.parse(e.target.result);
+      const data = JSON.parse(event.target.result);
+      const now = Date.now();
+
+      if (data.used) {
+        alert('This file has already been used.');
+        return;
+      }
+
+      if (now - data.date > FILE_VALIDITY_DURATION) {
+        alert('This file is expired.');
+        return;
+      }
+
+      // Mark the file as used
+      data.used = true;
+
+      // Start the timer
       timerEnd = data.timerEnd;
-      disabled = data.disabled;
-      resetDate = data.resetDate;
-      startTimer();
-    } catch {
-      alert("Invalid file.");
+      updateTimer();
+      timerInterval = setInterval(updateTimer, 1000);
+
+      // Save the updated file
+      const updatedBlob = new Blob([JSON.stringify(data)], { type: 'application/json' });
+      const updatedUrl = URL.createObjectURL(updatedBlob);
+      const a = document.createElement('a');
+      a.href = updatedUrl;
+      a.download = 'timer_state_used.json';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(updatedUrl);
+
+    } catch (e) {
+      alert('Invalid file format.');
     }
   };
   reader.readAsText(file);
 }
 
-// --- Reset Logic ---
-function isNewDay() {
-  const today = new Date().toISOString().split("T")[0];
-  return today !== resetDate;
-}
+// Event Listeners
 
-// --- Timer Loop ---
-function updateTimer() {
-  const now = Date.now();
-  const remain = timerEnd - now;
+// Generate file button
+generateFileBtn.addEventListener('click', generateTimerFile);
 
-  if (disabled) {
-    document.getElementById("timer").textContent = "Timer Disabled";
-    return;
+// Prompt user to upload file on page load
+window.addEventListener('load', () => {
+  alert('Please upload your timer file to start.');
+  fileInput.click();
+});
+
+// Handle file upload
+fileInput.addEventListener('change', (event) => {
+  const file = event.target.files[0];
+  if (file) {
+    validateAndStartTimer(file);
   }
+});
 
-  if (remain <= 0) {
-    document.body.innerHTML = "<h1 style='text-align:center;margin-top:20%;'>Access Denied. Please come back tomorrow.</h1>";
-    const iframe = document.getElementById("mathIframe");
-    if (iframe) iframe.style.display = "none";
-    return;
-  }
-
-  document.getElementById("timer").textContent = format(remain);
-  requestAnimationFrame(updateTimer);
-}
-
-// --- Timer Setup ---
-function startTimer() {
-  localStorage.setItem("timerEnd", timerEnd);
-  localStorage.setItem("disabled", disabled);
-  localStorage.setItem("resetDate", resetDate);
-  updateTimer();
-}
-
-// --- Timer Click to Disable ---
-document.addEventListener("DOMContentLoaded", () => {
-  const el = document.getElementById("timer");
-  el.addEventListener("click", () => {
-    const code = prompt("Enter code to disable:");
-    if (code === DISABLE_CODE) {
-      disabled = true;
-      localStorage.setItem("disabled", true);
-      el.textContent = "Timer Disabled";
-    } else {
-      alert("Wrong code.");
-    }
-  });
-
-  window.addEventListener("beforeunload", saveToFile);
-
-  // Restore if possible
-  const savedEnd = localStorage.getItem("timerEnd");
-  const savedDisabled = localStorage.getItem("disabled");
-  const savedDate = localStorage.getItem("resetDate");
-  const now = Date.now();
-
-  if (savedEnd && savedDate && !isNewDay()) {
-    timerEnd = parseInt(savedEnd);
-    resetDate = savedDate;
-    disabled = savedDisabled === "true";
-
-    const timeLeft = timerEnd - now;
-    if (timeLeft < LIMIT_REQUIRE_UPLOAD) {
-      const fileInput = document.createElement("input");
-      fileInput.type = "file";
-      fileInput.accept = ".json";
-      fileInput.style.display = "none";
-      fileInput.addEventListener("change", e => loadFromFile(e.target.files[0]));
-      document.body.appendChild(fileInput);
-      fileInput.click();
-    } else {
-      startTimer();
-    }
-  } else {
-    // Fresh day or missing data
-    timerEnd = now + MAX_TIME;
-    disabled = false;
-    resetDate = new Date().toISOString().split("T")[0];
-    startTimer();
+// Save timer state on page unload
+window.addEventListener('beforeunload', () => {
+  if (timerEnd) {
+    const timerData = {
+      timerEnd: timerEnd,
+      used: true,
+      date: Date.now()
+    };
+    const blob = new Blob([JSON.stringify(timerData)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'timer_state_autosave.json';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
   }
 });
